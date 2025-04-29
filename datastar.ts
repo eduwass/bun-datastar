@@ -41,6 +41,11 @@ Bun.serve({
             }
             return new Response(result.error, { status: 400 });
         }
+        
+        // on homepage serve index2.html
+        if (url.pathname === "/") {
+            return new Response(Bun.file("index2.html"));
+        }
 
         return new Response("Not found", { status: 404 });
     }
