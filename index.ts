@@ -1,85 +1,70 @@
 import { datastar } from "bun-datastar-sdk";
-import type { Server } from "bun";
 
 let messageCount = 0;
 
 // Create an SSE handler for real-time updates
 const handler = datastar.stream(async (stream) => {
-    const connectionId = Date.now().toString();
-    console.log(`[${connectionId}] New SSE connection established`);
+    // Initial state
+    stream.mergeSignals({
+        count: messageCount,
+        connectionStatus: 'connected'
+    });
 
-    try {
-        // Initial state
+    // Initial fragment
+    stream.mergeFragments(`<div class="success">
+        Connected at ${new Date().toLocaleTimeString()}
+    </div>`, {
+        selector: '#fragment-container',
+        mergeMode: 'append'
+    });
+
+    // Keep connection alive and update count and fragments periodically
+    while (true) {
+        await Bun.sleep(1000);
+        messageCount++;
+        
         stream.mergeSignals({
-            count: messageCount,
-            connectionStatus: 'connected'
+            count: messageCount
         });
 
-        // Initial fragment
-        stream.mergeFragments(`<div class="success">
-            Connected at ${new Date().toLocaleTimeString()}
-        </div>`, {
-            selector: '#fragment-container',
-            mergeMode: 'append'
-        });
-
-        // Keep connection alive and update count and fragments periodically
-        while (true) {
-            await Bun.sleep(1000);
-            messageCount++;
-            
-            stream.mergeSignals({
-                count: messageCount
+        // Send a new fragment every 5 seconds
+        if (messageCount % 5 === 0) {
+            stream.mergeFragments(`<div class="success">
+                Fragment update #${messageCount/5} at ${new Date().toLocaleTimeString()}
+            </div>`, {
+                selector: '#fragment-container',
+                mergeMode: 'append'
             });
-
-            // Send a new fragment every 5 seconds
-            if (messageCount % 5 === 0) {
-                stream.mergeFragments(`<div class="success">
-                    Fragment update #${messageCount/5} at ${new Date().toLocaleTimeString()}
-                </div>`, {
-                    selector: '#fragment-container',
-                    mergeMode: 'append'
-                });
-            }
         }
-    } catch (error) {
-        console.error(`[${connectionId}] SSE connection error:`, error);
     }
 });
 
 // Use with Bun's server
-const server = Bun.serve({
+Bun.serve({
     port: 3000,
-    async fetch(req: Request, server: Server): Promise<Response> {
-        try {
-            const url = new URL(req.url);
+    async fetch(req) {
+        const url = new URL(req.url);
 
-            // Handle SSE connections
-            if (url.pathname === "/events") {
-                return handler(req);
-            }
-
-            // Handle signal updates
-            if (url.pathname === "/signals") {
-                const result = await datastar.readSignals(req);
-                if (result.success) {
-                    messageCount++;
-                    return new Response("OK");
-                }
-                return new Response(result.error, { status: 400 });
-            }
-
-            // Serve index.html on homepage
-            if (url.pathname === "/") {
-                return new Response(Bun.file("index.html"));
-            }
-
-            return new Response("Not found", { status: 404 });
-        } catch (error) {
-            console.error('Server error:', error);
-            return new Response("Internal Server Error", { status: 500 });
+        // Handle SSE connections
+        if (url.pathname === "/events") {
+            return handler(req);
         }
+
+        // Handle signal updates
+        if (url.pathname === "/signals") {
+            const result = await datastar.readSignals(req);
+            if (result.success) {
+                messageCount++;
+                return new Response("OK");
+            }
+            return new Response(result.error, { status: 400 });
+        }
+
+        // Serve index.html on homepage
+        if (url.pathname === "/") {
+            return new Response(Bun.file("index.html"));
+        }
+
+        return new Response("Not found", { status: 404 });
     }
 });
-
-console.log(`Server running at http://localhost:${server.port}`);
