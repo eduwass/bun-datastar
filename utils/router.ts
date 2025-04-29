@@ -1,13 +1,19 @@
 import type { Server } from "bun";
 import { Edge } from "edge.js";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+// Get current directory
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Initialize Edge.js
 const edge = Edge.create({
     cache: process.env.NODE_ENV === 'production'
 });
 
-// Mount views directory using URL
-edge.mount(new URL('../views', import.meta.url));
+// Mount views directory using absolute path
+const viewsPath = join(__dirname, "..", "views");
+edge.mount(viewsPath);
 
 // Initialize routers for API and pages
 const apiRouter = new Bun.FileSystemRouter({
@@ -45,11 +51,11 @@ export async function handleRequest(req: Request): Promise<Response> {
     const pageMatch = pagesRouter.match(req);
     if (pageMatch) {
         try {
-            // Get template name without extension
-            const templateName = 'pages/index';
+            // Get template name from the URL pathname
+            const templateName = url.pathname === "/" ? "index" : url.pathname.slice(1);
             
             // Render the template with Edge.js
-            const html = await edge.render(templateName);
+            const html = await edge.render(`pages/${templateName}`);
             return new Response(html, {
                 headers: {
                     "Content-Type": "text/html",
