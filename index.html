@@ -8,10 +8,16 @@
         .loading { opacity: 0.5; }
         .success { color: green; }
         .error { color: red; }
+        .counter-box {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
-    <div data-signals="{message: '', count: 0, connectionStatus: '', fragmentsStatus: ''}">
+    <div data-signals="{message: '', count: 0, connectionStatus: '', fragmentsStatus: '', limitedCount: 0, limitedStatus: ''}">
         
         <!-- Test basic signal binding -->
         <h3>Basic Signal Test:</h3>
@@ -22,6 +28,25 @@
         <h3>Computed Value Test:</h3>
         <div data-computed-uppercase="$message.toUpperCase()">
             Uppercase: <span data-text="$uppercase"></span>
+        </div>
+
+        <!-- Count to 10 Test -->
+        <div class="counter-box">
+            <h3>Count to 10 Test:</h3>
+            <button 
+                data-on-click="@get('/stream/count-to-ten')"
+                data-indicator-loading-limited
+                data-attr-disabled="$limitedStatus === 'counting' || $limitedStatus === 'completed'"
+            >
+                Start Counting to 10
+            </button>
+            <div data-show="$limitedStatus">
+                <p>Status: <span data-text="$limitedStatus"></span></p>
+                <p>Count: <span data-text="$limitedCount"></span></p>
+                <span data-show="$limitedStatus === 'completed'" class="success">
+                    Finished counting to 10!
+                </span>
+            </div>
         </div>
 
         <!-- Test SSE connections -->
