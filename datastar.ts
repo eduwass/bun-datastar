@@ -1,24 +1,21 @@
 import { ServerSentEventGenerator } from "bun-datastar-sdk";
 
+let messageCount = 0;
 
-// Create an SSE handler
+// Create an SSE handler for real-time updates
 const handler = ServerSentEventGenerator.stream(async (stream) => {
-    // Send HTML fragments
-    stream.mergeFragments("<div>New content</div>", {
-        selector: "#target",
-        mergeMode: "inner"
-    });
-
-    // Send signals
+    // Initial state
     stream.mergeSignals({
-        count: 42,
-        status: "ready"
+        count: messageCount
     });
 
-    // Execute client-side scripts
-    stream.executeScript(`
-    console.log("Hello from Datastar!");
-  `);
+    // Keep connection alive and update count periodically
+    while (true) {
+        await Bun.sleep(1000);
+        stream.mergeSignals({
+            count: messageCount
+        });
+    }
 });
 
 // Use with Bun's server
@@ -36,13 +33,13 @@ Bun.serve({
         if (url.pathname === "/signals") {
             const result = await ServerSentEventGenerator.readSignals(req);
             if (result.success) {
-                // Handle signals...
+                messageCount++;
                 return new Response("OK");
             }
             return new Response(result.error, { status: 400 });
         }
-        
-        // on homepage serve index2.html
+
+        // Serve index2.html on homepage
         if (url.pathname === "/") {
             return new Response(Bun.file("index2.html"));
         }
