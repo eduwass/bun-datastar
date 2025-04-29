@@ -1,0 +1,24 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# DataStar + Bun POC Project
+
+This is a Proof of Concept (POC) project that demonstrates the minimal setup required to get Bun working with Data-star.
+
+## Project Documentation
+
+All relevant documentation for the LLM to reference is available in the `.cursor/docs/` directory. This includes:
+- Bun runtime/toolkit documentation.
+- Data-Star library documentation.
+
+When working on this project, the AI should check the `.cursor/docs/` directory for any relevant documentation that might help with the current task.
+
+
+## Project Philosophy
+
+This project is laser-focused on **extreme simplicity** and **minimal code**. Key principles:
+- Adding new dependencies is highly discouraged
+- Solutions should use the minimum possible lines of code
+- Keep everything as straightforward as possible
