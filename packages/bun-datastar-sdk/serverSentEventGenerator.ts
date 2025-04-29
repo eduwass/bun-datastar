@@ -1,4 +1,4 @@
-import { DatastarEventOptions, EventType, type Jsonifiable } from "./types.ts";
+import type { DatastarEventOptions, EventType, Jsonifiable } from "./types.ts";
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "./abstractServerSentEventGenerator.ts";
 import { createSSEHandler, type SSEStream } from "bun-sse";
 

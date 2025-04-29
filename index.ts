@@ -1,4 +1,4 @@
-import { ServerSentEventGenerator as datastar } from "bun-datastar-sdk";
+import { datastar } from "bun-datastar-sdk";
 
 let messageCount = 0;
 

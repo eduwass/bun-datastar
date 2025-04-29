@@ -1,11 +1,11 @@
-import {
+import type {
   DatastarEventOptions,
   EventType,
   ExecuteScriptOptions,
   FragmentOptions,
   MergeFragmentsOptions,
   MergeSignalsOptions,
-  type Jsonifiable,
+  Jsonifiable,
 } from "./types.ts";
 
 import { DefaultSseRetryDurationMs } from "./consts.ts";
