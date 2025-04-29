@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <div data-signals="{message: '', count: 0}">
+    <div data-signals="{message: '', count: 0, connectionStatus: ''}">
         <!-- Test basic signal binding -->
         <h3>Basic Signal Test:</h3>
         <input data-bind-message placeholder="Type something..." />
@@ -33,6 +33,7 @@
             Connect to SSE
         </button>
         <span data-show="$loading">Connecting...</span>
+        <span data-show="$connectionStatus === 'connected'" class="success">Connected!</span>
 
         <!-- Test signal updates from backend -->
         <h3>Backend Signal Test:</h3>

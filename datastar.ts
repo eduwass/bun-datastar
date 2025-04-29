@@ -6,7 +6,8 @@ let messageCount = 0;
 const handler = datastar.stream(async (stream) => {
     // Initial state
     stream.mergeSignals({
-        count: messageCount
+        count: messageCount,
+        connectionStatus: 'connected'
     });
 
     // Keep connection alive and update count periodically
