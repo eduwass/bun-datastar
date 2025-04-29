@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title || 'Datastar + Bun Test' }}</title>
-    @!section('styles')
     <style>
         .loading { opacity: 0.5; }
         .success { color: green; }
@@ -18,7 +17,7 @@
     </style>
 </head>
 <body>
-    @!section('content')
+    {{{ await $slots.content() }}}
 
     {{-- Load Datastar and initialize monitoring --}}
     <script type="module">

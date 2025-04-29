@@ -1,10 +1,13 @@
 import type { Server } from "bun";
 import { Edge } from "edge.js";
-import { join } from "path";
 
 // Initialize Edge.js
-const edge = new Edge();
-edge.mount(".");
+const edge = Edge.create({
+    cache: process.env.NODE_ENV === 'production'
+});
+
+// Mount views directory using URL
+edge.mount(new URL('../views', import.meta.url));
 
 // Initialize routers for API and pages
 const apiRouter = new Bun.FileSystemRouter({
@@ -42,8 +45,8 @@ export async function handleRequest(req: Request): Promise<Response> {
     const pageMatch = pagesRouter.match(req);
     if (pageMatch) {
         try {
-            // For Edge.js, we need the full path relative to the mounted root
-            const templateName = 'views/pages/index';
+            // Get template name without extension
+            const templateName = 'pages/index';
             
             // Render the template with Edge.js
             const html = await edge.render(templateName);
@@ -52,7 +55,7 @@ export async function handleRequest(req: Request): Promise<Response> {
                     "Content-Type": "text/html",
                 },
             });
-        } catch (error: any) { // Type assertion to handle error.message
+        } catch (error: any) {
             console.error('Template rendering error:', error);
             return new Response(`Template Error: ${error.message}`, { status: 500 });
         }
