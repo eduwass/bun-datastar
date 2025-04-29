@@ -44,7 +44,6 @@ import { createSSEHandler } from "bun-sse";
 const sse = createSSEHandler(async (stream, req) => {
   while (!req.signal.aborted) {
     stream.event("ping", { time: Date.now() });
-    stream.send("Hello!");
     await Bun.sleep(1000);
   }
 });
@@ -55,6 +54,25 @@ Bun.serve({
     return new Response("Hello World");
   }
 });
+```
+
+If you do a curl request to the endpoint, you'll see the SSE stream:
+
+```bash
+curl http://localhost:3000/stream
+```
+
+You should see something like this:
+
+```
+event: ping
+data: {"time":1714435200000}
+
+event: ping
+data: {"time":1714435201000}
+
+event: ping
+data: {"time":1714435202000}
 ```
 
 ---
