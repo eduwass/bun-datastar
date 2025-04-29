@@ -32,13 +32,11 @@ export function createSSEHandler(handler: SSEHandler): (req: Request) => Respons
         writer.write(encoder.encode(`retry: ${ms}\n\n`));
       },
       close() {
-        writer.close();
+        // intentionally a no-op to avoid Bun crash on double close
       },
     };
 
-    handler(stream, req).finally(() => {
-      writer.close();
-    });
+    handler(stream, req).catch(() => {}); // prevent unhandled rejection
 
     return new Response(readable, {
       status: 200,
