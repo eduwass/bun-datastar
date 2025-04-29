@@ -11,7 +11,7 @@
     </style>
 </head>
 <body>
-    <div data-signals="{message: '', count: 0, connectionStatus: ''}">
+    <div data-signals="{message: '', count: 0, connectionStatus: '', fragmentsStatus: ''}">
         
         <!-- Test basic signal binding -->
         <h3>Basic Signal Test:</h3>
@@ -24,22 +24,36 @@
             Uppercase: <span data-text="$uppercase"></span>
         </div>
 
-        <!-- Test SSE connection -->
-        <h3>SSE Connection Test:</h3>
-        <button 
-            data-on-click="@get('/events')"
-            data-indicator-loading
-        >
-            Connect to SSE
-        </button>
-        <span data-show="$loading">Connecting...</span>
-        <span data-show="$connectionStatus === 'connected'" class="success">Connected!</span>
-        <span data-show="$connectionStatus === 'error'" class="error">Connection Error!</span>
+        <!-- Test SSE connections -->
+        <h3>SSE Connections Test:</h3>
+        <div>
+            <button 
+                data-on-click="@get('/stream/message-count')"
+                data-indicator-loading-count
+            >
+                Connect to Message Counter
+            </button>
+            <span data-show="$loading_count">Connecting to counter...</span>
+            <span data-show="$connectionStatus === 'connected'" class="success">Counter Connected!</span>
+            <span data-show="$connectionStatus === 'error'" class="error">Counter Connection Error!</span>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <button 
+                data-on-click="@get('/stream/fragments')"
+                data-indicator-loading-fragments
+            >
+                Connect to Fragments
+            </button>
+            <span data-show="$loading_fragments">Connecting to fragments...</span>
+            <span data-show="$fragmentsStatus === 'connected'" class="success">Fragments Connected!</span>
+            <span data-show="$fragmentsStatus === 'error'" class="error">Fragments Connection Error!</span>
+        </div>
 
         <!-- Test signal updates from backend -->
         <h3>Backend Signal Test:</h3>
         <button 
-            data-on-click="@post('/signals', {value: $message})"
+            data-on-click="@post('/api/signals/update', {value: $message})"
             data-indicator-sending
             data-attr-disabled="$message === ''"
         >
@@ -71,10 +85,18 @@
             // Monitor SSE events
             window.addEventListener('datastar-merge-fragments', (e) => {
                 console.log('Received fragment:', e.detail);
+                document.querySelector('[data-signals]').setAttribute('data-signals', JSON.stringify({
+                    ...JSON.parse(document.querySelector('[data-signals]').getAttribute('data-signals')),
+                    fragmentsStatus: 'connected'
+                }));
             });
             
             window.addEventListener('datastar-merge-signals', (e) => {
                 console.log('Received signals:', e.detail);
+                document.querySelector('[data-signals]').setAttribute('data-signals', JSON.stringify({
+                    ...JSON.parse(document.querySelector('[data-signals]').getAttribute('data-signals')),
+                    connectionStatus: 'connected'
+                }));
             });
 
             // Monitor SSE connection state
@@ -84,10 +106,17 @@
                 const result = originalGet.apply(this, args);
                 result.catch(error => {
                     console.error('SSE Connection error:', error);
-                    document.querySelector('[data-signals]').setAttribute('data-signals', JSON.stringify({
-                        ...JSON.parse(document.querySelector('[data-signals]').getAttribute('data-signals')),
-                        connectionStatus: 'error'
-                    }));
+                    const signalsEl = document.querySelector('[data-signals]');
+                    const currentSignals = JSON.parse(signalsEl.getAttribute('data-signals'));
+                    
+                    // Determine which connection failed based on the URL
+                    if (args[0].includes('message-count')) {
+                        currentSignals.connectionStatus = 'error';
+                    } else if (args[0].includes('fragments')) {
+                        currentSignals.fragmentsStatus = 'error';
+                    }
+                    
+                    signalsEl.setAttribute('data-signals', JSON.stringify(currentSignals));
                 });
                 return result;
             };
@@ -102,7 +131,8 @@
                     const currentSignals = JSON.parse(signalsEl.getAttribute('data-signals') || '{}');
                     signalsEl.setAttribute('data-signals', JSON.stringify({
                         ...currentSignals,
-                        connectionStatus: 'error'
+                        connectionStatus: 'error',
+                        fragmentsStatus: 'error'
                     }));
                 }
             } catch (err) {

@@ -2,14 +2,27 @@ import { datastar } from "bun-datastar-sdk";
 
 let messageCount = 0;
 
-// Create an SSE handler for real-time updates
-const handler = datastar.stream(async (stream) => {
+// Create an SSE handler for real-time message count updates
+const messageStreamHandler = datastar.stream(async (stream) => {
     // Initial state
     stream.mergeSignals({
         count: messageCount,
         connectionStatus: 'connected'
     });
 
+    // Keep connection alive and update count periodically
+    while (true) {
+        await Bun.sleep(1000);
+        messageCount++;
+        
+        stream.mergeSignals({
+            count: messageCount
+        });
+    }
+});
+
+// Create an SSE handler for fragment updates
+const fragmentStreamHandler = datastar.stream(async (stream) => {
     // Initial fragment
     stream.mergeFragments(`<div class="success">
         Connected at ${new Date().toLocaleTimeString()}
@@ -18,24 +31,15 @@ const handler = datastar.stream(async (stream) => {
         mergeMode: 'append'
     });
 
-    // Keep connection alive and update count and fragments periodically
+    // Send new fragments periodically
     while (true) {
-        await Bun.sleep(1000);
-        messageCount++;
-        
-        stream.mergeSignals({
-            count: messageCount
+        await Bun.sleep(5000); // Every 5 seconds
+        stream.mergeFragments(`<div class="success">
+            Fragment update #${messageCount/5} at ${new Date().toLocaleTimeString()}
+        </div>`, {
+            selector: '#fragment-container',
+            mergeMode: 'append'
         });
-
-        // Send a new fragment every 5 seconds
-        if (messageCount % 5 === 0) {
-            stream.mergeFragments(`<div class="success">
-                Fragment update #${messageCount/5} at ${new Date().toLocaleTimeString()}
-            </div>`, {
-                selector: '#fragment-container',
-                mergeMode: 'append'
-            });
-        }
     }
 });
 
@@ -45,13 +49,18 @@ Bun.serve({
     async fetch(req) {
         const url = new URL(req.url);
 
-        // Handle SSE connections
-        if (url.pathname === "/events") {
-            return handler(req);
+        // Handle real-time message count updates
+        if (url.pathname === "/stream/message-count") {
+            return messageStreamHandler(req);
+        }
+
+        // Handle fragment updates
+        if (url.pathname === "/stream/fragments") {
+            return fragmentStreamHandler(req);
         }
 
         // Handle signal updates
-        if (url.pathname === "/signals") {
+        if (url.pathname === "/api/signals/update") {
             const result = await datastar.readSignals(req);
             if (result.success) {
                 messageCount++;
