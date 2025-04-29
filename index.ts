@@ -1,5 +1,14 @@
-import { handleApiRequest } from "./api/routes";
-import { serveFile } from "./utils/serve-file";
+// Initialize routers
+const apiRouter = new Bun.FileSystemRouter({
+    dir: "./api",
+    style: "nextjs"
+});
+
+const pagesRouter = new Bun.FileSystemRouter({
+    dir: "./pages",
+    style: "nextjs",
+    fileExtensions: [".html"]
+});
 
 // Start the server
 Bun.serve({
@@ -8,17 +17,24 @@ Bun.serve({
         const url = new URL(req.url);
         
         // First check if this is an API request
-        const apiResponse = await handleApiRequest(req);
-        if (apiResponse) return apiResponse;
-
-        // If not an API request, serve the index.html file
-        if (url.pathname === "/" || url.pathname === "/index.html") {
-            return serveFile("public/index.html");
+        if (url.pathname.startsWith("/api/")) {
+            const match = apiRouter.match(req);
+            if (match) {
+                const module = await import(match.filePath);
+                return module.default(req);
+            }
         }
 
-        // Serve static files from public directory
-        if (url.pathname.startsWith("/")) {
-            return serveFile(`public${url.pathname}`);
+        // Then try to match page routes
+        const pageMatch = pagesRouter.match(req);
+        if (pageMatch) {
+            return new Response(Bun.file(pageMatch.filePath));
+        }
+
+        // Try to serve static files from public directory
+        const staticFile = Bun.file(`public${url.pathname}`);
+        if (await staticFile.exists()) {
+            return new Response(staticFile);
         }
 
         // Return 404 for any unmatched routes

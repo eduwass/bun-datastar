@@ -1,7 +1,7 @@
 import { datastar } from "bun-datastar-sdk";
-import { incrementMessageCount } from "../streams/message-counter";
+import { incrementMessageCount } from "../stream/message-count";
 
-export async function handleSignalsUpdate(req: Request): Promise<Response> {
+export default async function handler(req: Request): Promise<Response> {
     const result = await datastar.readSignals(req);
     if (result.success) {
         incrementMessageCount();
