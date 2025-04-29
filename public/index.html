@@ -34,7 +34,7 @@
         <div class="counter-box">
             <h3>Count to 10 Test:</h3>
             <button 
-                data-on-click="@get('/stream/count-to-ten')"
+                data-on-click="@get('/api/stream/count-to-ten')"
                 data-indicator-loading-limited
                 data-attr-disabled="$limitedStatus === 'counting' || $limitedStatus === 'completed'"
             >
@@ -53,7 +53,7 @@
         <h3>SSE Connections Test:</h3>
         <div>
             <button 
-                data-on-click="@get('/stream/message-count')"
+                data-on-click="@get('/api/stream/message-count')"
                 data-indicator-loading-count
             >
                 Connect to Message Counter
@@ -65,7 +65,7 @@
 
         <div style="margin-top: 10px;">
             <button 
-                data-on-click="@get('/stream/fragments')"
+                data-on-click="@get('/api/stream/fragments')"
                 data-indicator-loading-fragments
             >
                 Connect to Fragments
