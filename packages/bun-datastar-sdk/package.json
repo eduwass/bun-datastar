@@ -1,5 +1,5 @@
 {
-  "name": "@yourorg/bun-datastar-sdk",
+  "name": "bun-datastar-sdk",
   "version": "0.1.0",
   "description": "A Bun-friendly Datastar SDK for SSE, compatible with bun-sse.",
   "main": "./index.ts",
