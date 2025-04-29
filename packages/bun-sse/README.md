@@ -2,6 +2,8 @@
 
 **Simple, minimal Server-Sent Events (SSE) helper for [Bun](https://bun.sh/)** — built to abstract away Bun's quirks around streaming, and make real-time communication easy and crash-free.
 
+See related Github Issue: https://github.com/oven-sh/bun/issues/2443
+
 ---
 
 ## 🔥 Why this exists
@@ -30,18 +32,6 @@ This tiny package wraps all that up for you.
 
 ```bash
 bun add bun-sse
-```
-
-or clone and link locally:
-
-```bash
-bun link # inside the bun-sse folder
-```
-
-Then in your project:
-
-```bash
-bun link bun-sse
 ```
 
 ---
