@@ -10,12 +10,32 @@ const handler = datastar.stream(async (stream) => {
         connectionStatus: 'connected'
     });
 
-    // Keep connection alive and update count periodically
+    // Initial fragment
+    stream.mergeFragments(`<div class="success">
+        Connected at ${new Date().toLocaleTimeString()}
+    </div>`, {
+        selector: '#fragment-container',
+        mergeMode: 'append'
+    });
+
+    // Keep connection alive and update count and fragments periodically
     while (true) {
         await Bun.sleep(1000);
+        messageCount++;
+        
         stream.mergeSignals({
             count: messageCount
         });
+
+        // Send a new fragment every 5 seconds
+        if (messageCount % 5 === 0) {
+            stream.mergeFragments(`<div class="success">
+                Fragment update #${messageCount/5} at ${new Date().toLocaleTimeString()}
+            </div>`, {
+                selector: '#fragment-container',
+                mergeMode: 'append'
+            });
+        }
     }
 });
 
@@ -40,7 +60,7 @@ Bun.serve({
             return new Response(result.error, { status: 400 });
         }
 
-        // Serve index2.html on homepage
+        // Serve index.html on homepage
         if (url.pathname === "/") {
             return new Response(Bun.file("index.html"));
         }
