@@ -1,4 +1,4 @@
-import type { DatastarEventOptions, EventType, Jsonifiable } from "./types.ts";
+import type { DatastarEventOptions, EventType, Jsonifiable, MergeFragmentsOptions, FragmentOptions, MergeSignalsOptions, ExecuteScriptOptions } from "./types.ts";
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "./abstractServerSentEventGenerator.ts";
 import { createSSEHandler, type SSEStream } from "bun-sse";
 
@@ -21,7 +21,6 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
 
   /**
    * Initializes the server-sent event generator and executes the streamFunc function.
-   *
    * @param streamFunc - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
    * @returns A handler function compatible with Bun's HTTP server
    */
@@ -35,26 +34,83 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
     });
   }
 
+  /**
+   * Merges HTML fragments into the DOM.
+   * @param fragments - The HTML fragments to merge
+   * @param options - Configuration options for merging
+   * @param options.selector - CSS selector to target where fragments should be merged
+   * @param options.mergeMode - How to merge the fragments: 'morph' (default), 'inner', 'outer', 'prepend', 'append', 'before', 'after', or 'upsertAttributes'
+   * @param options.useViewTransition - Whether to use view transitions API when merging
+   * @param options.eventId - Optional ID for the SSE event
+   * @param options.retryDuration - Optional retry duration in milliseconds
+   */
+  public override mergeFragments(fragments: string, options?: MergeFragmentsOptions): ReturnType<typeof this.send> {
+    return super.mergeFragments(fragments, options);
+  }
+
+  /**
+   * Removes HTML fragments from the DOM.
+   * @param selector - CSS selector for elements to remove
+   * @param options - Configuration options for removal
+   * @param options.useViewTransition - Whether to use view transitions API when removing
+   * @param options.eventId - Optional ID for the SSE event
+   * @param options.retryDuration - Optional retry duration in milliseconds
+   */
+  public override removeFragments(selector: string, options?: FragmentOptions): ReturnType<typeof this.send> {
+    return super.removeFragments(selector, options);
+  }
+
+  /**
+   * Merges signals into the store.
+   * @param data - Data object that will be merged into the client's signals
+   * @param options - Configuration options for merging
+   * @param options.onlyIfMissing - Only merge if the signal doesn't exist
+   * @param options.eventId - Optional ID for the SSE event
+   * @param options.retryDuration - Optional retry duration in milliseconds
+   */
+  public override mergeSignals(data: Record<string, Jsonifiable>, options?: MergeSignalsOptions): ReturnType<typeof this.send> {
+    return super.mergeSignals(data, options);
+  }
+
+  /**
+   * Removes signals from the store.
+   * @param paths - Array of dot-notation paths to remove from signals
+   * @param options - Configuration options
+   * @param options.eventId - Optional ID for the SSE event
+   * @param options.retryDuration - Optional retry duration in milliseconds
+   */
+  public override removeSignals(paths: string[], options?: DatastarEventOptions): ReturnType<typeof this.send> {
+    return super.removeSignals(paths, options);
+  }
+
+  /**
+   * Executes JavaScript in the browser.
+   * @param script - JavaScript code to execute
+   * @param options - Configuration options
+   * @param options.autoRemove - Whether to remove the script after execution (default: true)
+   * @param options.attributes - Script element attributes (type, defer, async, etc.)
+   * @param options.eventId - Optional ID for the SSE event
+   * @param options.retryDuration - Optional retry duration in milliseconds
+   */
+  public override executeScript(script: string, options?: ExecuteScriptOptions): ReturnType<typeof this.send> {
+    return super.executeScript(script, options);
+  }
+
   protected override send(
     event: EventType,
     dataLines: string[],
     options: DatastarEventOptions,
   ): string[] {
     const eventLines = super.send(event, dataLines, options);
-
-    // Join all lines into a single string and send it through bun-sse
     const eventData = eventLines.join("");
     this.stream.event(event, eventData);
-
     return eventLines;
   }
 
   /**
    * Reads client sent signals based on HTTP methods
-   *
-   * @params request - The Bun Request object.
-   *
-   * @returns An object containing a success boolean and either the client's signals or an error message.
+   * @param request - The Bun Request object
+   * @returns Object containing success status and either signals or error message
    */
   static async readSignals(request: Request): Promise<
     | { success: true; signals: Record<string, Jsonifiable> }
