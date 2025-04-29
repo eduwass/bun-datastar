@@ -1,9 +1,9 @@
-import { ServerSentEventGenerator } from "bun-datastar-sdk";
+import { ServerSentEventGenerator as datastar } from "bun-datastar-sdk";
 
 let messageCount = 0;
 
 // Create an SSE handler for real-time updates
-const handler = ServerSentEventGenerator.stream(async (stream) => {
+const handler = datastar.stream(async (stream) => {
     // Initial state
     stream.mergeSignals({
         count: messageCount
@@ -31,7 +31,7 @@ Bun.serve({
 
         // Handle signal updates
         if (url.pathname === "/signals") {
-            const result = await ServerSentEventGenerator.readSignals(req);
+            const result = await datastar.readSignals(req);
             if (result.success) {
                 messageCount++;
                 return new Response("OK");
