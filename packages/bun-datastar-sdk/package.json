@@ -9,7 +9,7 @@
   },
   "files": ["index.ts", "types.ts", "consts.ts", "abstractServerSentEventGenerator.ts", "serverSentEventGenerator.ts"],
   "keywords": ["datastar", "sse", "bun", "sdk"],
-  "author": "Your Name",
+  "author": "Edu Wass",
   "license": "MIT",
   "dependencies": {}
 } 
