@@ -1,4 +1,4 @@
-import { Server } from "bun";
+import type { Server } from "bun";
 
 // Initialize routers for API and pages
 const apiRouter = new Bun.FileSystemRouter({
