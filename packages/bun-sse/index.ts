@@ -15,28 +15,62 @@ export function createSSEHandler(handler: SSEHandler): (req: Request) => Respons
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
     const encoder = new TextEncoder();
+    const abortController = new AbortController();
 
     const stream: SSEStream = {
       send(data) {
+        if (abortController.signal.aborted) return;
         const payload = typeof data === "string" ? data : JSON.stringify(data);
-        writer.write(encoder.encode(`data: ${payload}\n\n`));
+        writer.write(encoder.encode(`data: ${payload}\n\n`)).catch(() => {});
       },
       event(name, data) {
+        if (abortController.signal.aborted) return;
         const payload = typeof data === "string" ? data : JSON.stringify(data);
-        writer.write(encoder.encode(`event: ${name}\ndata: ${payload}\n\n`));
+        writer.write(encoder.encode(`event: ${name}\ndata: ${payload}\n\n`)).catch(() => {});
       },
       id(id) {
-        writer.write(encoder.encode(`id: ${id}\n\n`));
+        if (abortController.signal.aborted) return;
+        writer.write(encoder.encode(`id: ${id}\n\n`)).catch(() => {});
       },
       retry(ms) {
-        writer.write(encoder.encode(`retry: ${ms}\n\n`));
+        if (abortController.signal.aborted) return;
+        writer.write(encoder.encode(`retry: ${ms}\n\n`)).catch(() => {});
       },
       close() {
-        // intentionally a no-op to avoid Bun crash on double close
+        if (abortController.signal.aborted) return;
+        try {
+          writer.close().catch(() => {});
+        } catch {
+          // Ignore close errors
+        }
+        abortController.abort();
       },
     };
 
-    handler(stream, req).catch(() => {}); // prevent unhandled rejection
+    // Handle connection cleanup
+    const cleanup = () => {
+      try {
+        stream.close();
+      } catch {
+        // Ignore close errors
+      }
+    };
+
+    // Listen for connection abort
+    req.signal.addEventListener('abort', () => {
+      cleanup();
+    });
+
+    // Handle the SSE stream
+    Promise.resolve().then(async () => {
+      try {
+        await handler(stream, req);
+      } catch (error) {
+        console.error('SSE handler error:', error);
+      } finally {
+        cleanup();
+      }
+    }).catch(() => {}); // Prevent unhandled rejections
 
     return new Response(readable, {
       status: 200,
