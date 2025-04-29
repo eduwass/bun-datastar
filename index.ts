@@ -18,7 +18,10 @@ Bun.serve({
         
         // First check if this is an API request
         if (url.pathname.startsWith("/api/")) {
-            const match = apiRouter.match(req);
+            // Strip the /api prefix before matching
+            const pathWithoutApi = url.pathname.replace(/^\/api/, "");
+            const match = apiRouter.match(pathWithoutApi);
+            
             if (match) {
                 const module = await import(match.filePath);
                 return module.default(req);
