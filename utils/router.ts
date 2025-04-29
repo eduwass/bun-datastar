@@ -1,4 +1,10 @@
 import type { Server } from "bun";
+import { Edge } from "edge.js";
+import { join } from "path";
+
+// Initialize Edge.js
+const edge = new Edge();
+edge.mount(".");
 
 // Initialize routers for API and pages
 const apiRouter = new Bun.FileSystemRouter({
@@ -7,15 +13,15 @@ const apiRouter = new Bun.FileSystemRouter({
 });
 
 const pagesRouter = new Bun.FileSystemRouter({
-    dir: "./pages",
+    dir: "./views/pages",
     style: "nextjs",
-    fileExtensions: [".html"]
+    fileExtensions: [".edge"]
 });
 
 /**
  * Handles all routing logic for the application including:
  * - API routes (/api/*)
- * - Page routes (mapped to .html files)
+ * - Page routes (mapped to .edge templates)
  * - Static files (from /public directory)
  */
 export async function handleRequest(req: Request): Promise<Response> {
@@ -35,7 +41,21 @@ export async function handleRequest(req: Request): Promise<Response> {
     // Handle page routes
     const pageMatch = pagesRouter.match(req);
     if (pageMatch) {
-        return new Response(Bun.file(pageMatch.filePath));
+        try {
+            // For Edge.js, we need the full path relative to the mounted root
+            const templateName = 'views/pages/index';
+            
+            // Render the template with Edge.js
+            const html = await edge.render(templateName);
+            return new Response(html, {
+                headers: {
+                    "Content-Type": "text/html",
+                },
+            });
+        } catch (error: any) { // Type assertion to handle error.message
+            console.error('Template rendering error:', error);
+            return new Response(`Template Error: ${error.message}`, { status: 500 });
+        }
     }
 
     // Handle static files

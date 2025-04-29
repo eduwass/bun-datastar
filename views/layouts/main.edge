@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datastar + Bun Test</title>
+    <title>{{ title || 'Datastar + Bun Test' }}</title>
+    @!section('styles')
     <style>
         .loading { opacity: 0.5; }
         .success { color: green; }
@@ -17,88 +18,9 @@
     </style>
 </head>
 <body>
-    <div data-signals="{message: '', count: 0, connectionStatus: '', fragmentsStatus: '', limitedCount: 0, limitedStatus: ''}">
-        
-        <!-- Test basic signal binding -->
-        <h3>Basic Signal Test:</h3>
-        <input data-bind-message placeholder="Type something..." />
-        <p>Echo: <span data-text="$message"></span></p>
+    @!section('content')
 
-        <!-- Test computed values -->
-        <h3>Computed Value Test:</h3>
-        <div data-computed-uppercase="$message.toUpperCase()">
-            Uppercase: <span data-text="$uppercase"></span>
-        </div>
-
-        <!-- Count to 10 Test -->
-        <div class="counter-box">
-            <h3>Count to 10 Test:</h3>
-            <button 
-                data-on-click="@get('/api/stream/count-to-ten')"
-                data-indicator-loading-limited
-                data-attr-disabled="$limitedStatus === 'counting' || $limitedStatus === 'completed'"
-            >
-                Start Counting to 10
-            </button>
-            <div data-show="$limitedStatus">
-                <p>Status: <span data-text="$limitedStatus"></span></p>
-                <p>Count: <span data-text="$limitedCount"></span></p>
-                <span data-show="$limitedStatus === 'completed'" class="success">
-                    Finished counting to 10!
-                </span>
-            </div>
-        </div>
-
-        <!-- Test SSE connections -->
-        <h3>SSE Connections Test:</h3>
-        <div>
-            <button 
-                data-on-click="@get('/api/stream/message-count')"
-                data-indicator-loading-count
-            >
-                Connect to Message Counter
-            </button>
-            <span data-show="$loading_count">Connecting to counter...</span>
-            <span data-show="$connectionStatus === 'connected'" class="success">Counter Connected!</span>
-            <span data-show="$connectionStatus === 'error'" class="error">Counter Connection Error!</span>
-        </div>
-
-        <div style="margin-top: 10px;">
-            <button 
-                data-on-click="@get('/api/stream/fragments')"
-                data-indicator-loading-fragments
-            >
-                Connect to Fragments
-            </button>
-            <span data-show="$loading_fragments">Connecting to fragments...</span>
-            <span data-show="$fragmentsStatus === 'connected'" class="success">Fragments Connected!</span>
-            <span data-show="$fragmentsStatus === 'error'" class="error">Fragments Connection Error!</span>
-        </div>
-
-        <!-- Test signal updates from backend -->
-        <h3>Backend Signal Test:</h3>
-        <button 
-            data-on-click="@post('/api/signals/update', {value: $message})"
-            data-indicator-sending
-            data-attr-disabled="$message === ''"
-        >
-            Send to Backend
-        </button>
-        <span data-show="$sending">Sending...</span>
-
-        <!-- Display backend response -->
-        <div data-show="$count > 0">
-            <p>Backend has processed <span data-text="$count"></span> messages</p>
-        </div>
-
-        <!-- Test fragment merging -->
-        <h3>Fragment Merging Test:</h3>
-        <div id="fragment-container">
-            Waiting for fragments...
-        </div>
-    </div>
-
-    <!-- Load Datastar and initialize monitoring -->
+    {{-- Load Datastar and initialize monitoring --}}
     <script type="module">
         // Import Datastar
         import 'https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js';
@@ -166,4 +88,4 @@
         });
     </script>
 </body>
-</html>
+</html> 

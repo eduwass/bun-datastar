@@ -8,8 +8,9 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "bun-datastar-sdk": "file:packages/bun-datastar-sdk",
     "bun-sse": "file:packages/bun-sse",
-    "bun-datastar-sdk": "file:packages/bun-datastar-sdk"
+    "edge.js": "^6.2.1"
   },
   "scripts": {
     "dev": "bun run index.ts --watch"
