@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Datastar + Bun Test</title>
-    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js"></script>
     <style>
         .loading { opacity: 0.5; }
         .success { color: green; }
@@ -35,6 +34,7 @@
         </button>
         <span data-show="$loading">Connecting...</span>
         <span data-show="$connectionStatus === 'connected'" class="success">Connected!</span>
+        <span data-show="$connectionStatus === 'error'" class="error">Connection Error!</span>
 
         <!-- Test signal updates from backend -->
         <h3>Backend Signal Test:</h3>
@@ -58,5 +58,57 @@
             Waiting for fragments...
         </div>
     </div>
+
+    <!-- Load Datastar and initialize monitoring -->
+    <script type="module">
+        // Import Datastar
+        import 'https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js';
+
+        // Wait for Datastar to be ready
+        window.addEventListener('datastar-ready', () => {
+            console.log('Datastar ready');
+            
+            // Monitor SSE events
+            window.addEventListener('datastar-merge-fragments', (e) => {
+                console.log('Received fragment:', e.detail);
+            });
+            
+            window.addEventListener('datastar-merge-signals', (e) => {
+                console.log('Received signals:', e.detail);
+            });
+
+            // Monitor SSE connection state
+            const originalGet = window.datastar.get;
+            window.datastar.get = function(...args) {
+                console.log('SSE Connection attempt:', args);
+                const result = originalGet.apply(this, args);
+                result.catch(error => {
+                    console.error('SSE Connection error:', error);
+                    document.querySelector('[data-signals]').setAttribute('data-signals', JSON.stringify({
+                        ...JSON.parse(document.querySelector('[data-signals]').getAttribute('data-signals')),
+                        connectionStatus: 'error'
+                    }));
+                });
+                return result;
+            };
+        });
+
+        // Global error handler
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e);
+            try {
+                const signalsEl = document.querySelector('[data-signals]');
+                if (signalsEl) {
+                    const currentSignals = JSON.parse(signalsEl.getAttribute('data-signals') || '{}');
+                    signalsEl.setAttribute('data-signals', JSON.stringify({
+                        ...currentSignals,
+                        connectionStatus: 'error'
+                    }));
+                }
+            } catch (err) {
+                console.error('Error updating connection status:', err);
+            }
+        });
+    </script>
 </body>
 </html>
