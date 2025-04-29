@@ -15,11 +15,9 @@
             border-radius: 4px;
         }
     </style>
+    <script type="module" src="/datastar.js"></script>
 </head>
 <body>
     {{{ await $slots.content() }}}
-
-    {{-- Load Datastar and initialize monitoring --}}
-    <script type="module" src="/datastar.js"></script>
 </body>
 </html> 
