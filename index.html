@@ -1,11 +1,56 @@
-<script>
-    const evtSource = new EventSource('http://localhost:3000/stream');
-    evtSource.onmessage = (event) => {
-        console.log('New message:', event.data);
-        const messages = document.querySelector('.messages');
-        messages.innerHTML += `<div>${event.data}</div>`;
-    };
-</script>
-<h1>Hello World</h1>
-<div class="messages">
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datastar + Bun Test</title>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js"></script>
+    <style>
+        .loading { opacity: 0.5; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div data-signals="{message: '', count: 0, connectionStatus: ''}">
+        
+        <!-- Test basic signal binding -->
+        <h3>Basic Signal Test:</h3>
+        <input data-bind-message placeholder="Type something..." />
+        <p>Echo: <span data-text="$message"></span></p>
+
+        <!-- Test computed values -->
+        <h3>Computed Value Test:</h3>
+        <div data-computed-uppercase="$message.toUpperCase()">
+            Uppercase: <span data-text="$uppercase"></span>
+        </div>
+
+        <!-- Test SSE connection -->
+        <h3>SSE Connection Test:</h3>
+        <button 
+            data-on-click="@get('/events')"
+            data-indicator-loading
+        >
+            Connect to SSE
+        </button>
+        <span data-show="$loading">Connecting...</span>
+        <span data-show="$connectionStatus === 'connected'" class="success">Connected!</span>
+
+        <!-- Test signal updates from backend -->
+        <h3>Backend Signal Test:</h3>
+        <button 
+            data-on-click="@post('/signals', {value: $message})"
+            data-indicator-sending
+            data-attr-disabled="$message === ''"
+        >
+            Send to Backend
+        </button>
+        <span data-show="$sending">Sending...</span>
+
+        <!-- Display backend response -->
+        <div data-show="$count > 0">
+            <p>Backend has processed <span data-text="$count"></span> messages</p>
+        </div>
+    </div>
+</body>
+</html>
