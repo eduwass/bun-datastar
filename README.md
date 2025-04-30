@@ -5,7 +5,6 @@ A simple Bun project to try it out with DataStar.
 ## Prerequisites
 
 - [Bun](https://bun.sh/) runtime installed
-- Node.js 18+ (recommended)
 
 ## Installation
 
