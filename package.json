@@ -8,8 +8,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "bun-sse": "file:packages/bun-sse",
-    "bun-datastar-sdk": "file:packages/bun-datastar-sdk"
+    "@starfederation/datastar-sdk": "^0.0.1"
   },
   "scripts": {
     "dev": "bun run index.ts --watch"

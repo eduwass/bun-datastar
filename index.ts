@@ -1,7 +1,3 @@
-import { startServer } from "./utils/router";
-// Start the server with routing for:
-// - API routes (/api/*)
-// - Page routes (mapped to .html files)
-// - Static files (from /public directory)
+import { startServer } from "./router";
 const server = startServer({ port: 3000 });
 console.log(`🚀 Server running at http://localhost:${server.port}`);

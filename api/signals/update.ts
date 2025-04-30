@@ -1,4 +1,4 @@
-import { datastar } from "bun-datastar-sdk";
+import { ServerSentEventGenerator as datastar } from "@datastar-typescript-sdk";
 import { incrementMessageCount } from "../stream/message-count";
 
 export default async function handler(req: Request): Promise<Response> {
