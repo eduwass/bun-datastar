@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "bun-sse-learn",
+      "name": "bun-datastar",
       "dependencies": {
         "@starfederation/datastar-sdk": "^0.0.1",
       },
