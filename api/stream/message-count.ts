@@ -1,4 +1,4 @@
-import { datastar } from "bun-datastar-sdk";
+import { ServerSentEventGenerator as datastar } from "@datastar-typescript-sdk";
 
 let messageCount = 0;
 
@@ -21,5 +21,5 @@ export default function handler(req: Request): Response {
                 count: messageCount
             });
         }
-    })(req);
+    });
 } 

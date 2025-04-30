@@ -1,4 +1,4 @@
-import { datastar } from "bun-datastar-sdk";
+import { ServerSentEventGenerator as datastar } from "@datastar-typescript-sdk";
 
 export default function handler(req: Request): Response {
     return datastar.stream(async (stream) => {
@@ -24,5 +24,5 @@ export default function handler(req: Request): Response {
         stream.mergeSignals({
             limitedStatus: 'completed'
         });
-    })(req);
+    });
 } 
