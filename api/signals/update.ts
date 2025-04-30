@@ -1,8 +1,8 @@
-import { datastar } from "bun-datastar-sdk";
+import { ServerSentEventGenerator } from "../../node_modules/@starfederation/datastar-sdk/src/web/serverSentEventGenerator";
 import { incrementMessageCount } from "../stream/message-count";
 
 export default async function handler(req: Request): Promise<Response> {
-    const result = await datastar.readSignals(req);
+    const result = await ServerSentEventGenerator.readSignals(req);
     if (result.success) {
         incrementMessageCount();
         return new Response("OK");
