@@ -5,8 +5,6 @@
       "name": "bun-sse-learn",
       "dependencies": {
         "@starfederation/datastar-sdk": "^0.0.1",
-        "bun-datastar-sdk": "file:packages/bun-datastar-sdk",
-        "bun-sse": "file:packages/bun-sse",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -22,10 +20,6 @@
     "@types/bun": ["@types/bun@1.2.11", "", { "dependencies": { "bun-types": "1.2.11" } }, "sha512-ZLbbI91EmmGwlWTRWuV6J19IUiUC5YQ3TCEuSHI3usIP75kuoA8/0PVF+LTrbEnVc8JIhpElWOxv1ocI1fJBbw=="],
 
     "@types/node": ["@types/node@22.15.3", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-lX7HFZeHf4QG/J7tBZqrCAXwz9J5RD56Y6MpP0eJkka8p+K0RY/yBTW7CYFJ4VGCclxqOLKmiGP5juQc6MKgcw=="],
-
-    "bun-datastar-sdk": ["bun-datastar-sdk@file:packages/bun-datastar-sdk", {}],
-
-    "bun-sse": ["bun-sse@file:packages/bun-sse", { "devDependencies": { "@types/bun": "latest" }, "peerDependencies": { "typescript": "^5.0.0" } }],
 
     "bun-types": ["bun-types@1.2.11", "", { "dependencies": { "@types/node": "*" } }, "sha512-dbkp5Lo8HDrXkLrONm6bk+yiiYQSntvFUzQp0v3pzTAsXk6FtgVMjdQ+lzFNVAmQFUkPQZ3WMZqH5tTo+Dp/IA=="],
 
