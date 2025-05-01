@@ -35,7 +35,7 @@
             <h3>Count to 10 Test:</h3>
             <button 
                 data-on-click="@get('/api/stream/count-to-ten')"
-                data-indicator-loading-limited
+                data-indicator-loadinglimited
                 data-attr-disabled="$limitedStatus === 'counting' || $limitedStatus === 'completed'"
             >
                 Start Counting to 10
@@ -54,11 +54,11 @@
         <div>
             <button 
                 data-on-click="@get('/api/stream/message-count')"
-                data-indicator-loading-count
+                data-indicator-loadingcount
             >
                 Connect to Message Counter
             </button>
-            <span data-show="$loading_count">Connecting to counter...</span>
+            <span data-show="$loadingcount">Connecting to counter...</span>
             <span data-show="$connectionStatus === 'connected'" class="success">Counter Connected!</span>
             <span data-show="$connectionStatus === 'error'" class="error">Counter Connection Error!</span>
         </div>
@@ -66,11 +66,11 @@
         <div style="margin-top: 10px;">
             <button 
                 data-on-click="@get('/api/stream/fragments')"
-                data-indicator-loading-fragments
+                data-indicator-loadingfragments
             >
                 Connect to Fragments
             </button>
-            <span data-show="$loading_fragments">Connecting to fragments...</span>
+            <span data-show="$loadingfragments">Connecting to fragments...</span>
             <span data-show="$fragmentsStatus === 'connected'" class="success">Fragments Connected!</span>
             <span data-show="$fragmentsStatus === 'error'" class="error">Fragments Connection Error!</span>
         </div>
